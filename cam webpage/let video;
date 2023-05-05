@@ -1,0 +1,65 @@
+let video;
+let warmFilter;
+let coolFilter;
+
+function setup() {
+  createCanvas(640, 480);
+  
+  // Create the video capture object
+  video = createCapture(VIDEO);
+  video.size(width, height);
+  video.hide();
+  
+  // Create the warm and cool filters
+  warmFilter = color(255, 255, 0, 100); // Tinted yellow filter
+  coolFilter = color(0, 0, 255, 100); // Tinted blue filter
+}
+
+function draw() {
+  background(0);
+  
+  // Draw the video feed
+  image(video, 0, 0, width, height);
+  
+  // Get the average color of the video feed
+  let averageColor = getAverageColor();
+  
+  // Determine if the color is warm or cool
+  let isWarmColor = isWarm(averageColor);
+  
+  // Apply the appropriate filter
+  if (isWarmColor) {
+    tint(warmFilter);
+     fill(255, 0, 0);
+    text("warm", width/2, height/2); 
+  } else {
+    tint(coolFilter);
+    text("cool", width/2, height/2); 
+  }
+  
+  // Apply the tinted filter to the video feed
+  image(video, 0, 0, width, height);
+}
+
+function getAverageColor() {
+  let videoImage = video.get();
+  videoImage.resize(1, 1); // Resize the image to 1x1 pixel
+  
+  // Get the color of the pixel
+  let colorArray = videoImage.get(0, 0);
+  
+  return colorArray;
+}
+
+function isWarm(color) {
+  // Extract the red, green, and blue components of the color
+  let r = red(color);
+  let g = green(color);
+  let b = blue(color);
+  
+  // Calculate the color temperature
+  let temperature = r - (g + b) / 2;
+  
+  // Determine if the color is warm or cool based on the temperature
+  return temperature > 0;
+}
